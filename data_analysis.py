@@ -5,6 +5,7 @@ import time, re, datetime
 import jinja2
 import os
 import json
+import math
 import numpy
 
 jinja_environment = jinja2.Environment(loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
@@ -17,11 +18,20 @@ class MainPage(webapp.RequestHandler):
 
 class Condense(webapp.RequestHandler):
 	def post(self):
-		stream = self.request.body
-		point_data = json.loads(stream)
-		self.response.headers['Content-Type'] = 'application/json'
-		t_list = { 'sum': sum(point_data), 'count':len(point_data), 'minimum': min(point_data), 'maximum': max(point_data), 'median': numpy.median(point_data) }
+		point_data = json.loads(self.request.body)
+		point_data.sort()
+		t_list = {
+			'sum': sum(point_data),
+			'count':len(point_data),
+			'minimum': min(point_data),
+			'maximum': max(point_data),
+			'median': numpy.median(point_data),
+			'upper_quartile': point_data[math.trunc(round(len(point_data)*0.75))],
+			'lower_quartile': point_data[math.trunc(round(len(point_data)*0.25))]
+		}
 		s = json.dumps( t_list )
+		
+		self.response.headers['Content-Type'] = 'application/json'
 		self.response.out.write(s)
 
 application = webapp.WSGIApplication(
