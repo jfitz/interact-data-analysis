@@ -7,5 +7,5 @@ data_json = json.dumps(data)
 payload = {'json_payload': data_json}
 headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
 
-response = requests.post("http://localhost:8080/stem", data=data_json, headers=headers)
+response = requests.post("http://interact-data-analysis.appspot.com/stem", data=data_json, headers=headers)
 print response.text

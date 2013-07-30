@@ -1,4 +1,4 @@
-application: data-analysis
+application: interact-data-analysis
 version: test
 runtime: python27
 threadsafe: true
@@ -14,3 +14,4 @@ libraries:
 
 - name: numpy
   version: latest
+
