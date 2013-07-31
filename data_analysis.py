@@ -24,7 +24,7 @@ def condense(points):
 	return result
 
 def stem_split(values, num_branches, scale_factor):
-	stem = []
+	branches = []
 	for i in range(num_branches):
 		minimum = i * scale_factor
 		maximum = (i + 1) * scale_factor
@@ -32,8 +32,26 @@ def stem_split(values, num_branches, scale_factor):
 		for value in values:
 			if value >= minimum and value < maximum:
 				branch_values.append(value)
-		stem.append( { 'minimum': minimum, 'maximum': maximum, 'values': branch_values } )
-	return stem
+		branches.append( { 'minimum': minimum, 'maximum': maximum, 'values': branch_values } )
+	return branches
+
+def stem_graph(branches):
+	stem_tuples = []
+	for branch in branches:
+		leader_char = str(branch['minimum'] / 10)
+		value_chars = []
+		for value in branch['values']:
+			value_chars.append(str(math.trunc((value - math.trunc(value)) * 10)))
+		value_chars.sort()
+		stem_tuples.append( (leader_char, ''.join(value_chars)) )
+	return stem_tuples
+	
+def stem_tuples_to_text(stem_tuples):
+	text_lines = []
+	for stem_tuple in stem_tuples:
+		leader, values = stem_tuple
+		text_lines.append(leader + '|' + values)
+	return text_lines
 
 class MainPage(webapp.RequestHandler):
 	def get(self):
@@ -57,11 +75,22 @@ class Stem(webapp.RequestHandler):
 		stem = stem_split(points, num_branches, scale_factor)
 		self.response.out.write( json.dumps( stem ) )
 		
+class StemGraph(webapp.RequestHandler):
+	def post(self):
+		body = self.request.body
+		stem= json.loads(body)
+		stem_tuples = stem_graph(stem)
+		stem_texts = stem_tuples_to_text(stem_tuples)
+		for text_line in stem_texts:
+			self.response.out.write(text_line)
+			self.response.out.write("\n")
+		
 application = webapp.WSGIApplication(
 	[
 		('/', MainPage),
 		('/condense', Condense),
-		('/stem', Stem)
+		('/stem', Stem),
+		('/stemgraph', StemGraph)
 	],
 	debug=False)
 
