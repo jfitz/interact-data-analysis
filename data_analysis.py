@@ -30,8 +30,9 @@ def stem_split(values, num_branches, scale_factor):
 		maximum = (i + 1) * scale_factor
 		branch_values = []
 		for value in values:
-			if value >= minimum and value < maximum:
-				branch_values.append(value)
+			rounded_value = round(value)
+			if rounded_value >= minimum and rounded_value < maximum:
+				branch_values.append(rounded_value)
 		branches.append( { 'minimum': minimum, 'maximum': maximum, 'values': branch_values } )
 	return branches
 
@@ -41,7 +42,7 @@ def stem_graph(branches):
 		leader_char = str(branch['minimum'] / 10)
 		value_chars = []
 		for value in branch['values']:
-			value_chars.append(str(math.trunc((value - math.trunc(value)) * 10)))
+			value_chars.append(str(math.trunc((value / 10 - math.trunc(value / 10) + 0.05) * 10)))
 		value_chars.sort()
 		stem_tuples.append( (leader_char, ''.join(value_chars)) )
 	return stem_tuples
