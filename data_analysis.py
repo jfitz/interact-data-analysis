@@ -11,6 +11,29 @@ import numpy
 
 jinja_environment = jinja2.Environment(loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
 
+def power_to_factor(power):
+	return pow(10.0, power)
+
+def front(value, power):
+	factor = power_to_factor(power)
+	return math.trunc((value / factor) + 0.5)
+
+def fraction(value):
+	return value - math.trunc(value)
+
+def remainder(value, power):
+	factor = power_to_factor(power)
+	format = '%0' + str(power) + 'd'
+	x1 = fraction(value / factor) * factor
+	x2 = format % x1
+	return x2[0]
+
+def compute_power(maximum_value):
+	power = 1
+	while (maximum_value / power_to_factor(power)) > 20:
+		power += 1
+	return power
+
 def condense(points):
 	points.sort()
 	result = {
@@ -24,29 +47,28 @@ def condense(points):
 	}
 	return result
 
-def stem_split(values, num_branches, scale_factor):
+def stem_split(values, num_branches, power):
 	branches = []
+	factor = power_to_factor(power)
 	for i in range(num_branches):
-		minimum = i * scale_factor
-		maximum = (i + 1) * scale_factor
+		minimum = i * factor
+		maximum = (i + 1) * factor
 		branch_values = []
 		for value in values:
-			rounded_value = round(value)
+			rounded_value = value + (0.05 * factor)
 			if rounded_value >= minimum and rounded_value < maximum:
 				branch_values.append(rounded_value)
 		branches.append( { 'minimum': minimum, 'maximum': maximum, 'values': branch_values } )
 	return branches
 
-def remainder(value, scale_factor):
-	return (value / scale_factor - math.trunc(value / scale_factor)) * scale_factor
-
-def stem_graph(branches, scale_factor):
+def stem_graph(branches, power):
 	stem_tuples = []
 	for branch in branches:
-		leader = int(branch['minimum'] / scale_factor)
+		leader = front(int(branch['minimum']), power)
 		value_chars = []
 		for value in branch['values']:
-			value_chars.append(str(remainder(value, scale_factor))[0])
+			char = remainder(value, power)
+			value_chars.append(char)
 		value_chars.sort()
 		stem_tuples.append( (leader, ''.join(value_chars)) )
 	return stem_tuples
@@ -75,26 +97,23 @@ class Stem(webapp.RequestHandler):
 		self.response.headers['Content-Type'] = 'application/json'
 		points = json.loads(self.request.body)
 		condensed_points = condense( points )
-		scale_factor = 1
 		range = condensed_points["maximum"] - condensed_points["minimum"]
-		while (range / scale_factor) > 20:
-			scale_factor *= 10
+		power = compute_power(range)
 		interquartile_distance = condensed_points['maximum'] - condensed_points['minimum']
+		scale_factor = power_to_factor(power)
 		num_branches = math.trunc( round((interquartile_distance / scale_factor) + 0.5) ) + 1
-		stem = stem_split(points, num_branches, scale_factor)
+		stem = stem_split(points, num_branches, power)
 		self.response.out.write( json.dumps( stem ) )
 		
 class StemGraph(webapp.RequestHandler):
 	def post(self):
 		body = self.request.body
 		stem = json.loads(body)
-		scale_factor = 1
 		maximum = 0
 		for branch in stem:
 			maximum = max(branch["maximum"], maximum)
-		while (maximum / scale_factor) > 20: 
-			scale_factor *= 10
-		stem_tuples = stem_graph(stem, scale_factor)
+		power = compute_power(maximum)
+		stem_tuples = stem_graph(stem, power)
 		stem_texts = stem_tuples_to_text(stem_tuples)
 		for text_line in stem_texts:
 			self.response.out.write(text_line)
