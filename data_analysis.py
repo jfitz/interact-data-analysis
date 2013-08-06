@@ -73,8 +73,7 @@ def stem_graph(branches, power):
 		stem_tuples.append( (leader, ''.join(value_chars)) )
 	return stem_tuples
 	
-def stem_tuples_to_text(stem_tuples):
-	leader_format = "%02d"
+def stem_tuples_to_text(stem_tuples, leader_format):
 	text_lines = []
 	for stem_tuple in stem_tuples:
 		leader, values = stem_tuple
@@ -113,8 +112,10 @@ class StemGraph(webapp.RequestHandler):
 		for branch in stem:
 			maximum = max(branch["maximum"], maximum)
 		power = compute_power(maximum)
+		leader_length = len(str(math.trunc(maximum))) - power
+		leader_format = '%0' + str(leader_length) + 'd'
 		stem_tuples = stem_graph(stem, power)
-		stem_texts = stem_tuples_to_text(stem_tuples)
+		stem_texts = stem_tuples_to_text(stem_tuples, leader_format)
 		for text_line in stem_texts:
 			self.response.out.write(text_line)
 			self.response.out.write("\n")
