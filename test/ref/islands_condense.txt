@@ -1,0 +1,7 @@
+count: 46
+lower_quartile: 23
+maximum: 16988
+median: 41.0
+minimum: 12
+sum: 56373
+upper_quartile: 184
