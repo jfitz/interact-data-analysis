@@ -26,9 +26,19 @@ def remainder(value, power):
 
 def compute_power(maximum_value):
 	power = 1
-	while (maximum_value / pow(10.0, power)) > 20:
-		power += 1
-	return (pow(10.0, power), power)
+	interval = 5
+	step_size = 10
+	while (maximum_value / step_size) > 20:
+		if interval == 5:
+			interval = 2
+		else:
+			if interval == 2:
+				interval = 1
+			else:
+				interval = 5
+				power += 1
+		step_size = pow(10.0, power) / interval
+	return (step_size, power)
 
 def condense(points):
 	points.sort()
@@ -43,19 +53,21 @@ def condense(points):
 	}
 	return result
 
-def stem_split(values, num_branches, step_size, power):
+def stem_split(values, minimum, maximum, step_size, power):
 	factor = pow(10.0, power)
 	round_delta = (0.05 * factor)
 	branches = []
-	for i in range(num_branches):
-		range_minimum = i * factor
+	i = 0
+	while i < maximum:
+		range_minimum = i
 		range_maximum = range_minimum + step_size
 		branch_values = []
 		for value in values:
 			rounded_value = value + round_delta
 			if rounded_value >= range_minimum and rounded_value < range_maximum:
-				branch_values.append(rounded_value)
+				branch_values.append(value)
 		branches.append( { 'minimum': range_minimum, 'maximum': range_maximum, 'values': branch_values } )
+		i += step_size
 	return branches
 
 def stem_graph(branches, power):
@@ -93,10 +105,12 @@ class Stem(webapp.RequestHandler):
 		self.response.headers['Content-Type'] = 'application/json'
 		points = json.loads(self.request.body)
 		condensed_points = condense( points )
-		data_range = condensed_points["maximum"] - condensed_points["minimum"]
+		minimum = condensed_points["minimum"]
+		maximum = condensed_points["maximum"]
+		data_range = maximum - minimum
 		(step_size, power) = compute_power(data_range)
 		num_branches = math.trunc( round((data_range / pow(10.0, power)) + 0.5) ) + 1
-		stem = stem_split(points, num_branches, step_size, power)
+		stem = stem_split(points, minimum, maximum, step_size, power)
 		self.response.out.write( json.dumps( stem ) )
 		
 class StemGraph(webapp.RequestHandler):
