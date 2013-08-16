@@ -1,5 +1,4 @@
-500 Internal Server Error
+0|00111111222233333333444455555556667779
+1|0001111133333333556677779
+2|001122366
 
-The server has either erred or is incapable of performing the requested operation.
-
-   
