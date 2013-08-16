@@ -53,10 +53,12 @@ def condense(points):
 	}
 	return result
 
-def stem_split(values, minimum, maximum, step_size, power):
+def stem_split(values, step_size, power):
 	factor = pow(10.0, power)
 	round_delta = (0.05 * factor)
 	branches = []
+	maximum = max(values)
+	minimum = min(values)
 	i = 0
 	while i < maximum:
 		range_minimum = i
@@ -110,7 +112,7 @@ class Stem(webapp.RequestHandler):
 		data_range = maximum - minimum
 		(step_size, power) = compute_power(data_range)
 		num_branches = math.trunc( round((data_range / pow(10.0, power)) + 0.5) ) + 1
-		stem = stem_split(points, minimum, maximum, step_size, power)
+		stem = stem_split(points, step_size, power)
 		self.response.out.write( json.dumps( stem ) )
 		
 class StemGraph(webapp.RequestHandler):
