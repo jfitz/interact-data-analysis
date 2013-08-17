@@ -12,7 +12,7 @@ import numpy
 jinja_environment = jinja2.Environment(loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
 
 def front(value, power):
-	return math.trunc((value / pow(10.0, power)) + 0.5)
+	return round(value / pow(10.0, power))
 
 def fraction(value):
 	return value - math.trunc(value)
@@ -54,8 +54,6 @@ def condense(points):
 	return result
 
 def stem_split(values, step_size, power):
-	factor = pow(10.0, power)
-	round_delta = (0.05 * factor)
 	branches = []
 	maximum = max(values)
 	minimum = min(values)
@@ -65,17 +63,17 @@ def stem_split(values, step_size, power):
 		range_maximum = range_minimum + step_size
 		branch_values = []
 		for value in values:
-			rounded_value = value + round_delta
-			if rounded_value >= range_minimum and rounded_value < range_maximum:
+			if value >= range_minimum and value < range_maximum:
 				branch_values.append(value)
 		branches.append( { 'minimum': range_minimum, 'maximum': range_maximum, 'values': branch_values } )
 		i += step_size
 	return branches
 
-def stem_graph(branches, power):
+def stem_graph(branches, leader_length, power):
 	stem_tuples = []
+	leader_format = '%0 ' + str(leader_length) + 'd'
 	for branch in branches:
-		leader = front(int(branch['minimum']), power)
+		leader = int(leader_format % (branch['minimum'] / pow(10, power)))
 		value_chars = []
 		for value in branch['values']:
 			char = remainder(value, power)
@@ -111,7 +109,7 @@ class Stem(webapp.RequestHandler):
 		maximum = condensed_points["maximum"]
 		data_range = maximum - minimum
 		(step_size, power) = compute_power(data_range)
-		num_branches = math.trunc( round((data_range / pow(10.0, power)) + 0.5) ) + 1
+		num_branches = round(data_range / pow(10.0, power) ) + 1
 		stem = stem_split(points, step_size, power)
 		self.response.out.write( json.dumps( stem ) )
 		
@@ -125,9 +123,9 @@ class StemGraph(webapp.RequestHandler):
 			range_maximum = max(branch["maximum"], range_maximum)
 			range_minimum = min(branch["minimum"], range_minimum)
 		(step_size, power) = compute_power(range_maximum)
-		leader_length = len(str(math.trunc(range_maximum))) - power
+		leader_length = 2 if (len(stem) > 10) else 1
 		leader_format = '%0' + str(leader_length) + 'd'
-		stem_tuples = stem_graph(stem, power)
+		stem_tuples = stem_graph(stem, leader_length, power)
 		stem_texts = stem_tuples_to_text(stem_tuples, leader_format)
 		for text_line in stem_texts:
 			self.response.out.write(text_line)

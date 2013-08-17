@@ -6,10 +6,10 @@ minimum: 1000.0
 values: []
 maximum: 3000.0
 minimum: 2000.0
-values: []
+values: [2968]
 maximum: 4000.0
 minimum: 3000.0
-values: [2968]
+values: []
 maximum: 5000.0
 minimum: 4000.0
 values: []
@@ -48,4 +48,4 @@ minimum: 15000.0
 values: []
 maximum: 17000.0
 minimum: 16000.0
-values: []
+values: [16988]
