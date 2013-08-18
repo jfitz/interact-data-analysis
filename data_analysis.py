@@ -69,8 +69,14 @@ def stem_split(values):
 		i += step_size
 	return branches
 
-def stem_graph(branches, power):
+def stem_graph(branches):
 	stem_tuples = []
+	range_maximum = 0
+	range_minimum = 0
+	for branch in branches:
+		range_maximum = max(branch["maximum"], range_maximum)
+		range_minimum = min(branch["minimum"], range_minimum)
+	step_size, power = compute_power(range_maximum)
 	for branch in branches:
 		leader = int(branch['minimum'] / pow(10, power))
 		value_chars = []
@@ -81,8 +87,10 @@ def stem_graph(branches, power):
 		stem_tuples.append( (leader, ''.join(value_chars)) )
 	return stem_tuples
 	
-def stem_tuples_to_text(stem_tuples, leader_format):
+def stem_tuples_to_text(stem_tuples):
 	text_lines = []
+	leader_length = 2 if (len(stem_tuples) > 10) else 1
+	leader_format = '%0' + str(leader_length) + 'd'
 	for stem_tuple in stem_tuples:
 		leader, values = stem_tuple
 		text_lines.append(leader_format % leader + '|' + values)
@@ -110,16 +118,8 @@ class StemGraph(webapp.RequestHandler):
 	def post(self):
 		body = self.request.body
 		stem = json.loads(body)
-		range_maximum = 0
-		range_minimum = 0
-		for branch in stem:
-			range_maximum = max(branch["maximum"], range_maximum)
-			range_minimum = min(branch["minimum"], range_minimum)
-		(step_size, power) = compute_power(range_maximum)
-		stem_tuples = stem_graph(stem, power)
-		leader_length = 2 if (len(stem) > 10) else 1
-		leader_format = '%0' + str(leader_length) + 'd'
-		stem_texts = stem_tuples_to_text(stem_tuples, leader_format)
+		stem_tuples = stem_graph(stem)
+		stem_texts = stem_tuples_to_text(stem_tuples)
 		for text_line in stem_texts:
 			self.response.out.write(text_line)
 			self.response.out.write("\n")
