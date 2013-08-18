@@ -1,5 +1,5 @@
 application: interact-data-analysis
-version: test
+version: production
 runtime: python27
 threadsafe: true
 api_version: 1
