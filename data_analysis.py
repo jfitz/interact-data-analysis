@@ -23,19 +23,19 @@ def remainder(value, power):
 
 def compute_power(maximum_value):
 	power = 1
-	interval = 5
-	step_size = 10
+	interval = 1
+	step_size = 1
 	while (maximum_value / step_size) > 20:
-		if interval == 5:
+		if interval == 1:
 			interval = 2
 		else:
 			if interval == 2:
-				interval = 1
-			else:
 				interval = 5
+			else:
+				interval = 2
 				power += 1
 		step_size = pow(10.0, power) / interval
-	return (step_size, power)
+	return (step_size, interval, power)
 
 def condense(points):
 	points.sort()
@@ -55,7 +55,7 @@ def stem_split(values):
 	maximum = max(values)
 	minimum = min(values)
 	data_range = maximum - minimum
-	(step_size, power) = compute_power(data_range)
+	step_size, interval, power = compute_power(data_range)
 	i = 0
 	while i < maximum:
 		range_minimum = i
@@ -76,15 +76,20 @@ def stem_graph(branches):
 	for branch in branches:
 		range_maximum = max(branch["maximum"], range_maximum)
 		range_minimum = min(branch["minimum"], range_minimum)
-	step_size, power = compute_power(range_maximum)
+	step_size, interval, power = compute_power(range_maximum)
+	leader2_format = '%0' + str(power) + 'd'
 	for branch in branches:
 		leader = int(branch['minimum'] / pow(10, power))
+		leader2 = int(branch['minimum']) - leader * pow(10, power)
 		value_chars = []
 		for value in branch['values']:
 			char = remainder(value, power)
 			value_chars.append(char)
 		value_chars.sort()
-		stem_tuples.append( (leader, ''.join(value_chars)) )
+		if interval != 1:
+			stem_tuples.append( {'leader': leader, 'leader2': leader2_format % leader2, 'values': ''.join(value_chars)} )
+		else:
+			stem_tuples.append( {'leader': leader, 'values': ''.join(value_chars)} )
 	return stem_tuples
 	
 def stem_tuples_to_text(stem_tuples):
@@ -92,8 +97,10 @@ def stem_tuples_to_text(stem_tuples):
 	leader_length = 2 if (len(stem_tuples) > 10) else 1
 	leader_format = '%0' + str(leader_length) + 'd'
 	for stem_tuple in stem_tuples:
-		leader, values = stem_tuple
-		text_lines.append(leader_format % leader + '|' + values)
+		if 'leader2' in stem_tuple:
+			text_lines.append(leader_format % stem_tuple['leader'] + '|' + str(stem_tuple['leader2']) + '|' + stem_tuple['values'])
+		else:
+			text_lines.append(leader_format % stem_tuple['leader'] + '|' + stem_tuple['values'])
 	return text_lines
 
 class MainPage(webapp.RequestHandler):
