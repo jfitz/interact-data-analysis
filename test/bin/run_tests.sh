@@ -8,3 +8,5 @@ bin/run_test.sh insects
 bin/run_test.sh precipitation
 
 bin/run_test.sh rivers
+
+bin/run_test.sh numbers
