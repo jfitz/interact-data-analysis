@@ -24,7 +24,7 @@ def remainder(value, power):
 def compute_power(maximum_value):
 	power = 1
 	interval = 1
-	step_size = 1
+	step_size = int(pow(10.0, power) * interval)
 	while (maximum_value / step_size) > 20:
 		if interval == 1:
 			interval = 2
@@ -32,9 +32,9 @@ def compute_power(maximum_value):
 			if interval == 2:
 				interval = 5
 			else:
-				interval = 2
+				interval = 1
 				power += 1
-		step_size = pow(10.0, power) / interval
+		step_size = int(pow(10.0, power) * interval)
 	return (step_size, interval, power)
 
 def condense(points):

@@ -1,57 +1,36 @@
-maximum: 5.0
+maximum: 20
 minimum: 0
-values: [4]
-maximum: 10.0
-minimum: 5.0
-values: [8]
-maximum: 15.0
-minimum: 10.0
-values: [10]
-maximum: 20.0
-minimum: 15.0
-values: [16, 17]
-maximum: 25.0
-minimum: 20.0
-values: [23]
-maximum: 30.0
-minimum: 25.0
-values: [27]
-maximum: 35.0
-minimum: 30.0
-values: [32]
-maximum: 40.0
-minimum: 35.0
-values: [39]
-maximum: 45.0
-minimum: 40.0
-values: []
-maximum: 50.0
-minimum: 45.0
+values: [4, 8, 10, 16, 17]
+maximum: 40
+minimum: 20
+values: [23, 27, 32, 39]
+maximum: 60
+minimum: 40
 values: [48]
-maximum: 55.0
-minimum: 50.0
+maximum: 80
+minimum: 60
+values: [64, 72, 77]
+maximum: 100
+minimum: 80
+values: [81, 89, 92]
+maximum: 120
+minimum: 100
+values: [101, 115]
+maximum: 140
+minimum: 120
+values: [128]
+maximum: 160
+minimum: 140
+values: [140, 150]
+maximum: 180
+minimum: 160
+values: [160, 170]
+maximum: 200
+minimum: 180
+values: [180]
+maximum: 220
+minimum: 200
 values: []
-maximum: 60.0
-minimum: 55.0
-values: []
-maximum: 65.0
-minimum: 60.0
-values: [64]
-maximum: 70.0
-minimum: 65.0
-values: []
-maximum: 75.0
-minimum: 70.0
-values: [72]
-maximum: 80.0
-minimum: 75.0
-values: [77]
-maximum: 85.0
-minimum: 80.0
-values: [81]
-maximum: 90.0
-minimum: 85.0
-values: [89]
-maximum: 95.0
-minimum: 90.0
-values: [92]
+maximum: 240
+minimum: 220
+values: [225]
