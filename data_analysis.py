@@ -77,19 +77,14 @@ def stem_graph(branches):
 		range_maximum = max(branch["maximum"], range_maximum)
 		range_minimum = min(branch["minimum"], range_minimum)
 	step_size, interval, power = compute_power(range_maximum)
-	leader2_format = '%0' + str(power) + 'd'
 	for branch in branches:
 		leader = int(branch['minimum'] / pow(10, power))
-		leader2 = int(branch['minimum']) - leader * pow(10, power)
 		value_chars = []
 		for value in branch['values']:
 			char = remainder(value, power)
 			value_chars.append(char)
 		value_chars.sort()
-		if interval != 1:
-			stem_tuples.append( {'leader': leader, 'leader2': leader2_format % leader2, 'values': ''.join(value_chars)} )
-		else:
-			stem_tuples.append( {'leader': leader, 'values': ''.join(value_chars)} )
+		stem_tuples.append( {'leader': leader, 'values': ''.join(value_chars)} )
 	return stem_tuples
 	
 def stem_tuples_to_text(stem_tuples):
@@ -97,10 +92,7 @@ def stem_tuples_to_text(stem_tuples):
 	leader_length = 2 if (len(stem_tuples) > 10) else 1
 	leader_format = '%0' + str(leader_length) + 'd'
 	for stem_tuple in stem_tuples:
-		if 'leader2' in stem_tuple:
-			text_lines.append(leader_format % stem_tuple['leader'] + '|' + str(stem_tuple['leader2']) + '|' + stem_tuple['values'])
-		else:
-			text_lines.append(leader_format % stem_tuple['leader'] + '|' + stem_tuple['values'])
+		text_lines.append(leader_format % stem_tuple['leader'] + '|' + stem_tuple['values'])
 	return text_lines
 
 class MainPage(webapp.RequestHandler):
