@@ -55,8 +55,8 @@ def condense(points):
 	}
 	return result
 
-def stem_split(values):
-	branches = []
+def group_values(values):
+	groups = []
 	maximum = max(values)
 	minimum = min(values)
 	data_range = maximum - minimum
@@ -65,28 +65,28 @@ def stem_split(values):
 	while i < maximum:
 		range_minimum = i
 		range_maximum = range_minimum + step_size
-		branch_values = []
+		group_values = []
 		for value in values:
 			if value >= range_minimum and value < range_maximum:
-				branch_values.append(value)
-		branch_values.sort()
-		branches.append( { 'minimum': range_minimum, 'maximum': range_maximum, 'values': branch_values } )
+				group_values.append(value)
+		group_values.sort()
+		groups.append( { 'minimum': range_minimum, 'maximum': range_maximum, 'values': group_values } )
 		i += step_size
-	return branches
+	return groups
 
-def stem_graph(branches):
+def stem_graph(groups):
 	stem_tuples = []
 	range_maximum = 0
 	range_minimum = 0
-	for branch in branches:
-		range_maximum = max(branch["maximum"], range_maximum)
-		range_minimum = min(branch["minimum"], range_minimum)
+	for group in groups:
+		range_maximum = max(group["maximum"], range_maximum)
+		range_minimum = min(group["minimum"], range_minimum)
 	step_size, interval, leader_power = compute_group_info(range_maximum)
-	for branch in branches:
-		leader = int(branch['minimum'] / pow(10, leader_power))
+	for group in groups:
+		leader = int(group['minimum'] / pow(10, leader_power))
 		value_chars = []
-		for value in branch['values']:
-			char = stem_char(value, branch["minimum"], branch["maximum"], interval, leader_power)
+		for value in group['values']:
+			char = stem_char(value, group["minimum"], group["maximum"], interval, leader_power)
 			value_chars.append(char)
 		value_chars.sort()
 		stem_tuples.append( {'leader': leader, 'values': ''.join(value_chars)} )
@@ -106,16 +106,16 @@ class MainPage(webapp.RequestHandler):
 		template = jinja_environment.get_template('templates/index.html')
 		self.response.out.write(template.render(template_values))
 
-class Condense(webapp.RequestHandler):
+class CondenseValues(webapp.RequestHandler):
 	def post(self):
 		self.response.headers['Content-Type'] = 'application/json'
 		self.response.out.write( json.dumps( condense( json.loads(self.request.body) ) ) )
 		
-class Stem(webapp.RequestHandler):
+class GroupValues(webapp.RequestHandler):
 	def post(self):
 		self.response.headers['Content-Type'] = 'application/json'
 		values = json.loads(self.request.body)
-		stem = stem_split(values)
+		stem = group_values(values)
 		self.response.out.write( json.dumps( stem ) )
 		
 class StemGraph(webapp.RequestHandler):
@@ -131,8 +131,8 @@ class StemGraph(webapp.RequestHandler):
 application = webapp.WSGIApplication(
 	[
 		('/', MainPage),
-		('/condense', Condense),
-		('/stem', Stem),
+		('/condense', CondenseValues),
+		('/group', GroupValues),
 		('/stemgraph', StemGraph)
 	],
 	debug=False)
