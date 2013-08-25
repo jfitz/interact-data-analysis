@@ -14,14 +14,19 @@ jinja_environment = jinja2.Environment(loader=jinja2.FileSystemLoader(os.path.di
 def fraction(value):
 	return value - math.trunc(value)
 
-def remainder(value, power):
+def stem_char(value, range_minimum, range_maximum, interval, power):
+	range_size = range_maximum - range_minimum
+	range_midpoint = (range_maximum + range_minimum) / 2
 	factor = pow(10.0, power)
 	format = '%0' + str(power) + 'd'
-	x1 = fraction(value / factor) * factor
-	x2 = format % x1
-	return x2[0]
+	x1 = value - range_minimum
+	x2 = int(x1)
+	x3 = format % x2
+	if interval == 1:
+		return x3[0]
+	return x3[0] if value < range_midpoint else '@'
 
-def compute_power(maximum_value):
+def compute_group_info(maximum_value):
 	power = 1
 	interval = 1
 	step_size = int(pow(10.0, power) * interval)
@@ -55,7 +60,7 @@ def stem_split(values):
 	maximum = max(values)
 	minimum = min(values)
 	data_range = maximum - minimum
-	step_size, interval, power = compute_power(data_range)
+	step_size, interval, power = compute_group_info(data_range)
 	i = 0
 	while i < maximum:
 		range_minimum = i
@@ -76,12 +81,12 @@ def stem_graph(branches):
 	for branch in branches:
 		range_maximum = max(branch["maximum"], range_maximum)
 		range_minimum = min(branch["minimum"], range_minimum)
-	step_size, interval, power = compute_power(range_maximum)
+	step_size, interval, leader_power = compute_group_info(range_maximum)
 	for branch in branches:
-		leader = int(branch['minimum'] / pow(10, power))
+		leader = int(branch['minimum'] / pow(10, leader_power))
 		value_chars = []
 		for value in branch['values']:
-			char = remainder(value, power)
+			char = stem_char(value, branch["minimum"], branch["maximum"], interval, leader_power)
 			value_chars.append(char)
 		value_chars.sort()
 		stem_tuples.append( {'leader': leader, 'values': ''.join(value_chars)} )
