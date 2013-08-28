@@ -15,31 +15,54 @@ def fraction(value):
 	return value - math.trunc(value)
 
 def stem_char(value, range_minimum, range_maximum, interval, power):
-	range_size = range_maximum - range_minimum
-	range_midpoint = (range_maximum + range_minimum) / 2
 	factor = pow(10.0, power)
+	delta = factor / 1000.0
+	range_size = range_maximum - range_minimum
+	range_midpoint = (range_maximum + range_minimum) / 2.0
 	format = '%0' + str(power) + 'd'
 	x1 = value - range_minimum
-	x2 = int(x1)
+	if value < 1.0:
+		x2 = int(x1 / factor * 10.0 + delta)
+	else:
+		x2 = int(x1)
 	x3 = format % x2
 	if interval == 1:
 		return x3[0]
-	return x3[0] if value < range_midpoint else '@'
+	retval = x3[0] if range_midpoint - value - delta > 0.0 else '@' 
+	return retval
 
 def compute_group_info(maximum_value):
 	power = 1
-	interval = 1
-	step_size = int(pow(10.0, power) * interval)
-	while (maximum_value / step_size) > 20:
-		if interval == 1:
-			interval = 2
-		else:
-			if interval == 2:
-				interval = 5
+	if maximum_value < 1:
+		while 10.0 ** power > maximum_value:
+			power -= 1
+		power += 1
+		interval = 5
+		step_size = (10.0 ** power) * interval
+		while (maximum_value / step_size) < 5:
+			if interval == 5:
+				interval = 2
 			else:
-				interval = 1
-				power += 1
-		step_size = int(pow(10.0, power) * interval)
+				if interval == 2:
+					interval = 1
+				else:
+					interval = 5
+					power -= 1
+			step_size = (10.0 ** power) * interval
+	else:
+		interval = 1
+		step_size = int((10.0 ** power) * interval)
+		while (maximum_value / step_size) > 20:
+			if interval == 1:
+				interval = 2
+			else:
+				if interval == 2:
+					interval = 5
+				else:
+					interval = 1
+					power += 1
+			step_size = int((10.0 ** power) * interval)
+			
 	return (step_size, interval, power)
 
 def condense(points):
