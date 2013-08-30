@@ -123,6 +123,18 @@ def stem_tuples_to_text(stem_tuples):
 		text_lines.append(leader_format % stem_tuple['leader'] + '|' + stem_tuple['values'])
 	return text_lines
 
+def transform_power(values, power):
+	transformed_values = []
+	for value in values:
+		transformed_values.append(value ** power)
+	return transformed_values
+
+def transform_log(values):
+	transformed_values = []
+	for value in values:
+		transformed_values.append(math.log10(value))
+	return transformed_values
+
 class MainPage(webapp.RequestHandler):
 	def get(self):
 		template_values = { }
@@ -151,12 +163,29 @@ class StemGraph(webapp.RequestHandler):
 			self.response.out.write(text_line)
 			self.response.out.write("\n")
 		
+class TransformPower(webapp.RequestHandler):
+	def post(self):
+		body = self.request.body
+		values = json.loads(body)
+		power = float(self.request.get('power'))
+		transformed_values = transform_power(values, power)
+		self.response.out.write( json.dumps( transformed_values ) )
+		
+class TransformLog(webapp.RequestHandler):
+	def post(self):
+		body = self.request.body
+		values = json.loads(body)
+		transformed_values = transform_log(values)
+		self.response.out.write( json.dumps( transformed_values ) )
+		
 application = webapp.WSGIApplication(
 	[
 		('/', MainPage),
 		('/condense', CondenseValues),
 		('/group', GroupValues),
-		('/stemgraph', StemGraph)
+		('/stemgraph', StemGraph),
+		('/transform/power', TransformPower),
+		('/transform/log', TransformLog)
 	],
 	debug=False)
 
