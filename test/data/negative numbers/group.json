@@ -1,0 +1,23 @@
+[
+{"maximum": -140, "minimum": -160, "values": [-150]},
+{"maximum": -120, "minimum": -140, "values": []},
+{"maximum": -100, "minimum": -120, "values": []},
+{"maximum": -80, "minimum": -100, "values": []},
+{"maximum": -60, "minimum": -80, "values": [-78, -70, -64]},
+{"maximum": -40, "minimum": -60, "values": []},
+{"maximum": -20, "minimum": -40, "values": [-32]},
+{"maximum": 0, "minimum": -20, "values": [-16, -8, -4, -2, -1]},
+{"maximum": 20, "minimum": 0, "values": [4, 8, 10, 16, 17]},
+{"maximum": 40, "minimum": 20, "values": [23, 27, 32, 39]},
+{"maximum": 60, "minimum": 40, "values": [48]},
+{"maximum": 80, "minimum": 60, "values": [64, 72, 77]},
+{"maximum": 100, "minimum": 80, "values": [81, 89, 92]},
+{"maximum": 120, "minimum": 100, "values": []},
+{"maximum": 140, "minimum": 120, "values": []},
+{"maximum": 160, "minimum": 140, "values": []},
+{"maximum": 180, "minimum": 160, "values": [170]},
+{"maximum": 200, "minimum": 180, "values": [180]},
+{"maximum": 220, "minimum": 200, "values": []},
+{"maximum": 240, "minimum": 220, "values": [225]}
+]
+

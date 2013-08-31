@@ -19,16 +19,35 @@ def stem_char(value, range_minimum, range_maximum, interval, power):
 	delta = factor / 1000.0
 	range_size = range_maximum - range_minimum
 	range_midpoint = (range_maximum + range_minimum) / 2.0
+	value_less_than_midpoint = False
+	if value > 0:
+		if range_midpoint - value - delta > 0.0:
+			value_less_than_midpoint = True
+	else:
+		if range_midpoint - value + delta < 0.0:
+			value_less_than_midpoint = True
+
 	format = '%0' + str(power) + 'd'
-	x1 = value - range_minimum
-	if value < 1.0:
+
+	if value < 0:
+		x1 = math.fabs(math.fabs(value) - math.fabs(range_maximum))
+	else:
+		x1 = value - range_minimum
+
+	if math.fabs(value) < 1.0:
 		x2 = int(x1 / factor * 10.0 + delta)
 	else:
 		x2 = int(x1)
+
 	x3 = format % x2
+
 	if interval == 1:
-		return x3[0]
-	retval = x3[0] if range_midpoint - value - delta > 0.0 else '@' 
+		retval = x3[0]
+	else:
+		if value_less_than_midpoint:
+			retval = x3[0]
+		else:
+			retval = '@' 
 	return retval
 
 def compute_group_info(maximum_value):
@@ -85,6 +104,19 @@ def group_values(values):
 	data_range = maximum - minimum
 	step_size, interval, power = compute_group_info(data_range)
 	i = 0
+	while i > minimum:
+		i -= step_size
+	while i < 0:
+		range_minimum = i
+		range_maximum = range_minimum + step_size
+		group_values = []
+		for value in values:
+			if value >= range_minimum and value < range_maximum:
+				group_values.append(value)
+		group_values.sort()
+		groups.append( { 'minimum': range_minimum, 'maximum': range_maximum, 'values': group_values } )
+		i += step_size
+	i = 0
 	while i < maximum:
 		range_minimum = i
 		range_maximum = range_minimum + step_size
@@ -118,9 +150,14 @@ def stem_graph(groups):
 def stem_tuples_to_text(stem_tuples):
 	text_lines = []
 	leader_length = 2 if (len(stem_tuples) > 10) else 1
-	leader_format = '%0' + str(leader_length) + 'd'
 	for stem_tuple in stem_tuples:
-		text_lines.append(leader_format % stem_tuple['leader'] + '|' + stem_tuple['values'])
+		leader = stem_tuple['leader']
+		this_leader_length = leader_length
+		if leader < 0:
+			this_leader_length += 1
+		leader_format = '%0' + str(this_leader_length) + 'd'
+		leader_string = leader_format % leader
+		text_lines.append(leader_string + '|' + stem_tuple['values'])
 	return text_lines
 
 def transform_power(values, power):
