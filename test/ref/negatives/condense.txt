@@ -1,0 +1,7 @@
+count: 10
+lower_quartile: -64
+maximum: -1
+median: -24.0
+minimum: -150
+sum: -425
+upper_quartile: -2

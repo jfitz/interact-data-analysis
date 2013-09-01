@@ -136,7 +136,7 @@ def stem_graph(groups):
 	for group in groups:
 		range_maximum = max(group["maximum"], range_maximum)
 		range_minimum = min(group["minimum"], range_minimum)
-	step_size, interval, leader_power = compute_group_info(range_maximum)
+	step_size, interval, leader_power = compute_group_info(range_maximum - range_minimum)
 	for group in groups:
 		leader = int(group['minimum'] / pow(10, leader_power))
 		value_chars = []
