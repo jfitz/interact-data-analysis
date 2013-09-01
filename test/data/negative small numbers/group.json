@@ -1,0 +1,15 @@
+[
+{"maximum": -0.22, "minimum": -0.24, "values": [-0.225]},
+{"maximum": -0.2, "minimum": -0.22, "values": []},
+{"maximum": -0.18, "minimum": -0.2, "values": []},
+{"maximum": -0.16, "minimum": -0.18, "values": [-0.18, -0.17]},
+{"maximum": -0.14, "minimum": -0.16, "values": [-0.16, -0.15]},
+{"maximum": -0.12, "minimum": -0.14, "values": [-0.14, -0.128]},
+{"maximum": -0.1, "minimum": -0.12, "values": [-0.115, -0.101]},
+{"maximum": -0.08, "minimum": -0.1, "values": [-0.092, -0.089, -0.081]},
+{"maximum": -0.06, "minimum": -0.08, "values": [-0.077, -0.072, -0.064]},
+{"maximum": -0.04, "minimum": -0.06, "values": [-0.048]},
+{"maximum": -0.02, "minimum": -0.04, "values": [-0.039, -0.032, -0.027, -0.023]},
+{"maximum": 0, "minimum": -0.02, "values": [-0.017, -0.016, -0.01, -0.008, -0.004]}
+]
+
