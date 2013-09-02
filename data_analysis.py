@@ -109,6 +109,8 @@ def group_values(values):
 	while i < 0:
 		range_minimum = i
 		range_maximum = range_minimum + step_size
+		if math.fabs(range_maximum) < 1e-16:
+			range_maximum = 0
 		group_values = []
 		for value in values:
 			if value >= range_minimum and value < range_maximum:
@@ -116,6 +118,8 @@ def group_values(values):
 		group_values.sort()
 		groups.append( { 'minimum': range_minimum, 'maximum': range_maximum, 'values': group_values } )
 		i += step_size
+		if math.fabs(i) < 1e-16:
+			i = 0
 	i = 0
 	while i < maximum:
 		range_minimum = i
