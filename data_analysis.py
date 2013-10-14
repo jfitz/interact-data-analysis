@@ -231,6 +231,21 @@ def transform_log(values):
 		transformed_values.append(math.log10(value))
 	return transformed_values
 
+def transform_scale(values):
+	bias = min(values)
+	scale = max(values) - bias
+	transformed_values = []
+	for value in values:
+		transformed_values.append((value - bias) / scale)
+	return transformed_values
+
+def transform_zerobase(values):
+	transformed_values = []
+	bias = min(values)
+	for value in values:
+		transformed_values.append(value - bias)
+	return transformed_values
+
 class MainPage(webapp.RequestHandler):
 	def get(self):
 		template_values = { }
@@ -283,6 +298,20 @@ class TransformLog(webapp.RequestHandler):
 		transformed_values = transform_log(values)
 		self.response.out.write( json.dumps( transformed_values ) )
 		
+class TransformScale(webapp.RequestHandler):
+	def post(self):
+		body = self.request.body
+		values = json.loads(body)
+		transformed_values = transform_scale(values)
+		self.response.out.write( json.dumps( transformed_values ) )
+		
+class TransformZeroBase(webapp.RequestHandler):
+	def post(self):
+		body = self.request.body
+		values = json.loads(body)
+		transformed_values = transform_zerobase(values)
+		self.response.out.write( json.dumps( transformed_values ) )
+		
 application = webapp.WSGIApplication(
 	[
 		('/', MainPage),
@@ -291,7 +320,9 @@ application = webapp.WSGIApplication(
 		('/group', GroupValues),
 		('/stemgraph', StemGraph),
 		('/transform/power', TransformPower),
-		('/transform/log', TransformLog)
+		('/transform/log', TransformLog),
+		('/transform/scale', TransformScale),
+		('/transform/zerobase', TransformZeroBase)
 	],
 	debug=False)
 
