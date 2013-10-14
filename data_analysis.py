@@ -97,6 +97,61 @@ def condense(points):
 	}
 	return result
 
+def outlier_character(value):
+	if value == 0:
+		return ' '
+	if value < 10:
+		return str(value)
+	return '+'
+
+def box_plot(points):
+	condensed_points = condense(points)
+
+	data_range = condensed_points['maximum'] - condensed_points['minimum']
+	scale = 100.0
+	min_pos = 0
+	max_pos = int(scale)
+	median_pos = int((condensed_points['median'] - condensed_points['minimum']) / data_range * scale)
+	upper_quartile_pos = int((condensed_points['upper_quartile'] - condensed_points['minimum']) / data_range * scale)
+	lower_quartile_pos = int((condensed_points['lower_quartile'] - condensed_points['minimum']) / data_range * scale)
+	iq = upper_quartile_pos - lower_quartile_pos
+	upper_outlier_pos = min(upper_quartile_pos + iq, int(scale))
+	lower_outlier_pos = max(lower_quartile_pos - iq, 0)
+
+	scaled_points = {}
+	for point in points:
+		scaled_point = int((point - condensed_points['minimum']) / data_range * scale)
+		scaled_points[scaled_point] = scaled_points.get(scaled_point, 0) + 1
+
+	lines = []
+	line = ''
+	# lower outliers
+	for i in range(0, lower_outlier_pos - 1):
+		line += outlier_character(scaled_points.get(i, 0))
+	line += '['
+
+	# lower quartile
+	line += '-' * (lower_quartile_pos - lower_outlier_pos - 2)
+	line += 'L'
+
+	# points around median
+	line += '-' * (median_pos - lower_quartile_pos - 2)
+	line += 'M'
+	line += '-' * (upper_quartile_pos - median_pos - 2)
+
+	# upper quartile
+	line += 'U'
+	line += '-' * (upper_outlier_pos - upper_quartile_pos - 2)
+
+	# upper outliers
+	line += ']'
+	for i in range(upper_outlier_pos + 1, int(scale)):
+		line += outlier_character(scaled_points.get(i, 0))
+		
+	lines.append(line)
+	
+	return lines
+
 def group_values(values):
 	groups = []
 	maximum = max(values)
@@ -187,6 +242,15 @@ class CondenseValues(webapp.RequestHandler):
 		self.response.headers['Content-Type'] = 'application/json'
 		self.response.out.write( json.dumps( condense( json.loads(self.request.body) ) ) )
 		
+class BoxPlot(webapp.RequestHandler):
+	def post(self):
+		body = self.request.body
+		points = json.loads(body)
+		box_plot_lines = box_plot(points)
+		for text_line in box_plot_lines:
+			self.response.out.write(text_line)
+			self.response.out.write("\n")
+		
 class GroupValues(webapp.RequestHandler):
 	def post(self):
 		self.response.headers['Content-Type'] = 'application/json'
@@ -223,6 +287,7 @@ application = webapp.WSGIApplication(
 	[
 		('/', MainPage),
 		('/condense', CondenseValues),
+		('/boxplot', BoxPlot),
 		('/group', GroupValues),
 		('/stemgraph', StemGraph),
 		('/transform/power', TransformPower),
