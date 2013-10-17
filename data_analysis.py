@@ -231,7 +231,7 @@ def transform_log(values):
 		transformed_values.append(math.log10(value))
 	return transformed_values
 
-def transform_scale(values):
+def transform_normalize(values):
 	bias = min(values)
 	scale = max(values) - bias
 	transformed_values = []
@@ -298,11 +298,11 @@ class TransformLog(webapp.RequestHandler):
 		transformed_values = transform_log(values)
 		self.response.out.write( json.dumps( transformed_values ) )
 		
-class TransformScale(webapp.RequestHandler):
+class TransformNormalize(webapp.RequestHandler):
 	def post(self):
 		body = self.request.body
 		values = json.loads(body)
-		transformed_values = transform_scale(values)
+		transformed_values = transform_normalize(values)
 		self.response.out.write( json.dumps( transformed_values ) )
 		
 class TransformZeroBase(webapp.RequestHandler):
@@ -321,7 +321,7 @@ application = webapp.WSGIApplication(
 		('/stemgraph', StemGraph),
 		('/transform/power', TransformPower),
 		('/transform/log', TransformLog),
-		('/transform/scale', TransformScale),
+		('/transform/normalize', TransformNormalize),
 		('/transform/zerobase', TransformZeroBase)
 	],
 	debug=False)

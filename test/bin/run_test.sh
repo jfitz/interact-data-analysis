@@ -26,7 +26,7 @@ echo Test function $FUNCTION
 python "bin/${FUNCTION}.py" <"data/${DATA}/data.json" >"$TMP/${DATA}_${FUNCTION}.txt"
 diff "$TMP/${DATA}_${FUNCTION}.txt" "ref/${DATA}/${FUNCTION}.txt"
 
-FUNCTION=transform_scale
+FUNCTION=transform_normalize
 echo Test function $FUNCTION
 python "bin/${FUNCTION}.py" <"data/${DATA}/data.json" >"$TMP/${DATA}_${FUNCTION}.txt"
 diff "$TMP/${DATA}_${FUNCTION}.txt" "ref/${DATA}/${FUNCTION}.txt"
