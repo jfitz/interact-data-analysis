@@ -6,7 +6,7 @@ echo Test function $FUNCTION
 python "bin/${FUNCTION}.py" <"data/${DATA}/data.json" | python "bin/${FUNCTION}_to_text.py" >"$TMP/${DATA}_${FUNCTION}.txt"
 diff "$TMP/${DATA}_${FUNCTION}.txt" "ref/${DATA}/${FUNCTION}.txt"
 
-FUNCTION=boxplot
+FUNCTION=boxplot_text
 echo Test function $FUNCTION
 python "bin/${FUNCTION}.py" <"data/${DATA}/data.json" >"$TMP/${DATA}_${FUNCTION}.txt"
 diff "$TMP/${DATA}_${FUNCTION}.txt" "ref/${DATA}/${FUNCTION}.txt"

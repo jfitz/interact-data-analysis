@@ -104,7 +104,7 @@ def outlier_character(value):
 		return str(value)
 	return '+'
 
-def box_plot(points):
+def box_plot_text(points):
 	condensed_points = condense(points)
 
 	data_range = condensed_points['maximum'] - condensed_points['minimum']
@@ -260,8 +260,14 @@ class CondenseValues(webapp.RequestHandler):
 class BoxPlot(webapp.RequestHandler):
 	def post(self):
 		body = self.request.body
+		format = self.request.get('format', 'text')
 		points = json.loads(body)
-		box_plot_lines = box_plot(points)
+		box_plot_lines = []
+		if format == 'text':
+			box_plot_lines = box_plot_text(points)
+		else:
+			if format == 'processing':
+				box_plot_lines = ['not implemented','try again']
 		for text_line in box_plot_lines:
 			self.response.out.write(text_line)
 			self.response.out.write("\n")
@@ -287,7 +293,7 @@ class TransformPower(webapp.RequestHandler):
 	def post(self):
 		body = self.request.body
 		values = json.loads(body)
-		power = float(self.request.get('power'))
+		power = float(self.request.get('power', '1.0'))
 		transformed_values = transform_power(values, power)
 		self.response.out.write( json.dumps( transformed_values ) )
 		
