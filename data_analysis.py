@@ -152,6 +152,91 @@ def box_plot_text(points):
 	
 	return lines
 
+def box_plot_processing(points):
+	condensed_points = condense(points)
+
+	group1 = """
+int scale_to_view_width(float value, float max_value, float min_value, int view_width)
+{
+  return int((value - min_value) / (max_value - min_value) * view_width);
+}
+
+void boxplot(int scaled_median, int scaled_lower_quartile, int[] scaled_lower_outliers, int scaled_upper_quartile, int[] scaled_upper_outliers, int median_size, int quartile_size, int outlier_size, int view_height)
+{
+  int horizon = view_height / 2;
+        		
+  // draw horizontal
+  line(scaled_lower_quartile, horizon, scaled_upper_quartile, horizon);
+
+  // draw lower outliers
+  for ( int i = 0; i < scaled_lower_outliers.length; i += 1 )
+    line(scaled_lower_outliers[i], horizon - outlier_size, scaled_lower_outliers[i], horizon + outlier_size);
+
+  // draw lower quartile
+  line(scaled_lower_quartile, horizon - quartile_size, scaled_lower_quartile, horizon + quartile_size);
+
+  // draw median
+  line(scaled_median, horizon - median_size, scaled_median, horizon + median_size);
+
+  // draw upper quartile
+  line(scaled_upper_quartile, horizon - quartile_size, scaled_upper_quartile, horizon + quartile_size);
+
+  // draw upper outliers
+  for ( int i = 0; i < scaled_upper_outliers.length; i += 1 )
+    line(scaled_upper_outliers[i], horizon - outlier_size, scaled_upper_outliers[i], horizon + outlier_size);
+}
+
+int view_width = 640;
+int view_height = 60;
+
+void setup()
+{
+  noLoop();
+
+  size(view_width, view_height);
+  noSmooth();
+
+  background(0);
+}
+
+void draw()
+{
+  // settings
+  int outlier_size = 5;
+  int quartile_size = 10;
+  int median_size = 5;
+  stroke(255);
+
+""".splitlines()
+	group2 = []
+	group2.append("  // data")
+	group2.append("  float[] lower_outliers = { 67, 70 };")
+	group2.append("  float lower_quartile = " + str(condensed_points['lower_quartile']) + ";")
+	group2.append("  float median = " + str(condensed_points['median']) + ";")
+	group2.append("  float upper_quartile = " + str(condensed_points['upper_quartile']) + ";")
+	group2.append("  float[] upper_outliers = { 210.0, 220.0, 222.0, 240.0 };")
+	group2.append("  float max_value = " + str(condensed_points['maximum']) + ";")
+	group2.append("  float min_value = " + str(condensed_points['minimum']) + ";")
+	group3 = """
+  int horiz_offset = 10;
+  
+  // scale values to ints
+  int scaled_median = scale_to_view_width(median, max_value, min_value, view_width) + horiz_offset;
+  int scaled_lower_quartile = scale_to_view_width(lower_quartile, max_value, min_value, view_width) + horiz_offset;
+  int scaled_upper_quartile = scale_to_view_width(upper_quartile, max_value, min_value, view_width) + horiz_offset;
+  int[] scaled_lower_outliers = new int[lower_outliers.length];
+  for ( int i = 0; i < lower_outliers.length; i += 1 )
+    scaled_lower_outliers[i] = scale_to_view_width(lower_outliers[i], max_value, min_value, view_width) + horiz_offset;
+  int[] scaled_upper_outliers = new int[upper_outliers.length];
+  for ( int i = 0; i < upper_outliers.length; i += 1 )
+    scaled_upper_outliers[i] = scale_to_view_width(upper_outliers[i], max_value, min_value, view_width) + horiz_offset;
+    
+  boxplot(scaled_median, scaled_lower_quartile, scaled_lower_outliers, scaled_upper_quartile, scaled_upper_outliers, median_size, quartile_size, outlier_size, view_height);
+}
+""".splitlines()
+
+	return group1 + group2 + group3
+	
 def group_values(values):
 	groups = []
 	maximum = max(values)
@@ -267,7 +352,7 @@ class BoxPlot(webapp.RequestHandler):
 			box_plot_lines = box_plot_text(points)
 		else:
 			if format == 'processing':
-				box_plot_lines = ['not implemented','try again']
+				box_plot_lines = box_plot_processing(points)
 		for text_line in box_plot_lines:
 			self.response.out.write(text_line)
 			self.response.out.write("\n")
