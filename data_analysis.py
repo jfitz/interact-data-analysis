@@ -152,7 +152,7 @@ def box_plot_text(points):
 	
 	return lines
 
-def box_plot_processing(points):
+def box_plot_processing(points, orientation):
 	condensed_points = condense(points)
 	upper_quartile = condensed_points['upper_quartile']
 	lower_quartile = condensed_points['lower_quartile']
@@ -169,7 +169,10 @@ def box_plot_processing(points):
 		'upper_outliers': [x for x in points if x > upper_outlier_bound],
 		'lower_outliers': [x for x in points if x < lower_outlier_bound]
 		 }
-	template = jinja_environment.get_template('templates/horizontal_boxplot.processing.jinja')
+	if orientation == 'vertical':
+		template = jinja_environment.get_template('templates/vertical_boxplot.processing.jinja')
+	else:
+		template = jinja_environment.get_template('templates/horizontal_boxplot.processing.jinja')
 
 	return template.render(template_values)
 	
@@ -292,7 +295,7 @@ class BoxPlot(webapp.RequestHandler):
 				self.response.out.write("\n")
 		else:
 			if format == 'processing':
-				box_plot_lines = box_plot_processing(points)
+				box_plot_lines = box_plot_processing(points, orientation)
 				self.response.out.write(box_plot_lines)
 		
 class GroupValues(webapp.RequestHandler):

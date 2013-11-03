@@ -1,0 +1,82 @@
+
+int scale_to_view_width(float value, float max_value, float min_value, int view_width)
+{
+  return int((value - min_value) / (max_value - min_value) * view_width);
+}
+
+int scale_to_view_height(float value, float max_value, float min_value, int view_height)
+{
+  return int((value - min_value) / (max_value - min_value) * view_height);
+}
+
+void boxplot(int scaled_median, int scaled_lower_quartile, int[] scaled_lower_outliers, int scaled_upper_quartile, int[] scaled_upper_outliers, int median_size, int quartile_size, int outlier_size, int view_width)
+{
+  int centerline = view_width / 2;
+        		
+  // draw horizontal
+  line(centerline, scaled_lower_quartile, centerline, scaled_upper_quartile);
+
+  // draw lower outliers
+  for ( int i = 0; i < scaled_lower_outliers.length; i += 1 )
+    line(centerline - outlier_size, scaled_lower_outliers[i], centerline + outlier_size, scaled_lower_outliers[i]);
+
+  // draw lower quartile
+  line(centerline - quartile_size, scaled_lower_quartile, centerline + quartile_size, scaled_lower_quartile);
+
+  // draw median
+  line(centerline - median_size, scaled_median, centerline + median_size, scaled_median);
+
+  // draw upper quartile
+  line(centerline - quartile_size, scaled_upper_quartile, centerline + quartile_size, scaled_upper_quartile);
+
+  // draw upper outliers
+  for ( int i = 0; i < scaled_upper_outliers.length; i += 1 )
+    line(centerline - outlier_size, scaled_upper_outliers[i], centerline + outlier_size, scaled_upper_outliers[i]);
+}
+
+int view_width = 60;
+int view_height = 600;
+
+void setup()
+{
+  noLoop();
+
+  size(view_width, view_height);
+  noSmooth();
+
+  background(0);
+}
+
+void draw()
+{
+  // settings
+  int outlier_size = 5;
+  int quartile_size = 10;
+  int median_size = 5;
+  stroke(255);
+
+  // data
+  float[] lower_outliers = {  };
+  float lower_quartile = 0.027;
+  float median = 0.077;
+  float upper_quartile = 0.14;
+  float[] upper_outliers = {  };
+  float max_value = 0.225;
+  float min_value = 0.004;
+  int horiz_offset = 10;
+  int vertical_offset = 20;
+  
+  // scale values to ints
+  int scaled_median = scale_to_view_height(median, max_value, min_value, view_height) + vertical_offset;
+  int scaled_lower_quartile = scale_to_view_height(lower_quartile, max_value, min_value, view_height) + vertical_offset;
+  int scaled_upper_quartile = scale_to_view_height(upper_quartile, max_value, min_value, view_height) + vertical_offset;
+  int[] scaled_lower_outliers = new int[lower_outliers.length];
+  for ( int i = 0; i < lower_outliers.length; i += 1 )
+    scaled_lower_outliers[i] = scale_to_view_height(lower_outliers[i], max_value, min_value, view_height) + vertical_offset;
+  int[] scaled_upper_outliers = new int[upper_outliers.length];
+  for ( int i = 0; i < upper_outliers.length; i += 1 )
+    scaled_upper_outliers[i] = scale_to_view_height(upper_outliers[i], max_value, min_value, view_height) + vertical_offset;
+    
+  boxplot(scaled_median, scaled_lower_quartile, scaled_lower_outliers, scaled_upper_quartile, scaled_upper_outliers, median_size, quartile_size, outlier_size, view_width);
+}
+
