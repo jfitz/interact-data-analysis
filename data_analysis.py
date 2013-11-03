@@ -154,13 +154,20 @@ def box_plot_text(points):
 
 def box_plot_processing(points):
 	condensed_points = condense(points)
+	upper_quartile = condensed_points['upper_quartile']
+	lower_quartile = condensed_points['lower_quartile']
+	iq = upper_quartile - lower_quartile
+	upper_outlier_bound = upper_quartile + iq
+	lower_outlier_bound = lower_quartile - iq
 
 	template_values = {
-		'median': str(condensed_points['median']),
-		'minimum': str(condensed_points['minimum']),
-		'maximum': str(condensed_points['maximum']),
-		'upper_quartile': str(condensed_points['upper_quartile']),
-		'lower_quartile': str(condensed_points['lower_quartile'])
+		'median': condensed_points['median'],
+		'minimum': condensed_points['minimum'],
+		'maximum': condensed_points['maximum'],
+		'upper_quartile': upper_quartile,
+		'lower_quartile': lower_quartile,
+		'upper_outliers': [x for x in points if x > upper_outlier_bound],
+		'lower_outliers': [x for x in points if x < lower_outlier_bound]
 		 }
 	template = jinja_environment.get_template('templates/horizontal_boxplot.processing.jinja')
 

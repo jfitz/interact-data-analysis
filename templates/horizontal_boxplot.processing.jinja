@@ -51,11 +51,11 @@ void draw()
   stroke(255);
 
   // data
-  float[] lower_outliers = { 67, 70 };
+  float[] lower_outliers = { {{ lower_outliers|join(', ') }} };
   float lower_quartile = {{ lower_quartile }};
   float median = {{ median }};
   float upper_quartile = {{ upper_quartile }};
-  float[] upper_outliers = { 210.0, 220.0, 222.0, 240.0 };
+  float[] upper_outliers = { {{ upper_outliers|join(', ') }} };
   float max_value = {{ maximum }};
   float min_value = {{ minimum }};
   int horiz_offset = 10;
