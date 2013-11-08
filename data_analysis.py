@@ -86,12 +86,18 @@ def compute_group_info(maximum_value):
 
 def condense(points):
 	points.sort()
+	count = len(points)
+	mean = sum(points)/len(points)
+	deviations = [x - mean for x in points]
 	result = {
 		'sum': sum(points),
-		'count':len(points),
+		'count': count,
 		'minimum': min(points),
 		'maximum': max(points),
+		'mean': mean,
+		'mean_deviation': sum([abs(x - mean) for x in points])/count,
 		'median': numpy.median(points),
+		'standard_deviation': pow(sum([pow(x - mean, 2) for x in points])/count, 0.5),
 		'upper_quartile': points[math.trunc(round(len(points)*0.75))],
 		'lower_quartile': points[math.trunc(round(len(points)*0.25))]
 	}

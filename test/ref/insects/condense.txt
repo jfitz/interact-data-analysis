@@ -1,7 +1,11 @@
 count: 72
 lower_quartile: 3
 maximum: 26
+mean: 9.5
+mean_deviation: 6.22222222222
 median: 7.0
 minimum: 0
+standard_deviation: 7.15308791129
 sum: 684
 upper_quartile: 15
+

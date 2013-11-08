@@ -1,7 +1,10 @@
 count: 141
 lower_quartile: 310
 maximum: 3710
+mean: 591.184397163
+mean_deviation: 313.550827423
 median: 425.0
 minimum: 135
+standard_deviation: 492.116410763
 sum: 83357
 upper_quartile: 696
