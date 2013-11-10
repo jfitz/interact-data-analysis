@@ -57,12 +57,12 @@ void draw()
 
   // data
   float[] lower_outliers = { -150 };
-  float lower_quartile = -64;
+  float lower_quartile = -64.0;
   float median = -24.0;
-  float upper_quartile = -2;
+  float upper_quartile = -2.0;
   float[] upper_outliers = {  };
-  float max_value = -1;
-  float min_value = -150;
+  float max_value = -1.0;
+  float min_value = -150.0;
   int horiz_offset = 10;
   int vertical_offset = 20;
   

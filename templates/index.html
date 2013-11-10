@@ -10,7 +10,7 @@
 <table summary="list of offered services" border="1px">
 <thead><th>Service</th><th>Description</th><th>parameters</th><th>Input (request body)</th><th>Input format</th><th>Output (response body)</th><th>Output format</th></thead>
 <tr valign="top"><td>condense</td><td>Provides the count, sum, median, minimum, maximum, and midspread</td><td>none</td><td>A simple list of values</td><td>JSON</td><td>The calculated values</td><td>JSON</td></tr>
-<tr valign="top"><td>boxplot</td><td>Produces box plot</td><td>format: 'text' (default) or 'processing'<br>orientation: 'horizontal' (default) or 'vertical'</td><td>A simple list of values</td><td>JSON</td><td>Box plot</td><td>ASCII graphic or PDE file for processing</td></tr>
+<tr valign="top"><td>boxplot</td><td>Produces box plot</td><td>format: 'text' (default) or 'processing'<br>orientation: 'horizontal' (default) or 'vertical'</td><td>A set of condensed values</td><td>JSON</td><td>Box plot</td><td>ASCII graphic or PDE file for processing</td></tr>
 <tr valign="top"><td>group</td><td>Groups data for a stem-and-leaf plot</td><td>none</td><td>A simple list of values</td><td>JSON</td><td>The values organized into branches</td><td>JSON</td></tr>
 <tr valign="top"><td>stemgraph</td><td>Produces stem-and-leaf plot</td><td>none</td><td>The values organized into branches</td><td>JSON</td><td>Stem-and-graph plot</td><td>text</td></tr>
 <tr valign="top"><td>transform/power</td><td>Adjusts data by raising each value to a power</td><td>power</td><td>A simple list of values</td><td>JSON</td><td>The calculated values</td><td>JSON</td></tr>

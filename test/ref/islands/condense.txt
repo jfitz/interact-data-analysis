@@ -1,10 +1,12 @@
 count: 46
+lower_outliers: []
 lower_quartile: 23
 maximum: 16988
 mean: 1225.5
-mean_deviation: 0
+mean_deviation: 1991.04347826
 median: 41.0
 minimum: 12
-standard_deviation: 0
+standard_deviation: 3382.67600365
 sum: 56373
+upper_outliers: [840, 2968, 5500, 6795, 9390, 11506, 16988]
 upper_quartile: 184

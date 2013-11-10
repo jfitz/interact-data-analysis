@@ -1,4 +1,5 @@
 count: 25
+lower_outliers: []
 lower_quartile: 27
 maximum: 225
 mean: 82.72
@@ -7,4 +8,5 @@ median: 77.0
 minimum: 4
 standard_deviation: 61.1087686016
 sum: 2068
+upper_outliers: []
 upper_quartile: 140

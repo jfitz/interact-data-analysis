@@ -56,8 +56,8 @@ void draw()
   float median = 36.2;
   float upper_quartile = 43.1;
   float[] upper_outliers = { 59.2, 59.8, 67 };
-  float max_value = 67;
-  float min_value = 7;
+  float max_value = 67.0;
+  float min_value = 7.0;
   int horiz_offset = 10;
   
   // scale values to ints

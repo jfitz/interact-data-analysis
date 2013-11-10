@@ -87,6 +87,11 @@ def compute_group_info(maximum_value):
 def condense(points):
 	points.sort()
 	count = len(points)
+	upper_quartile = points[math.trunc(round(len(points)*0.75))]
+	lower_quartile = points[math.trunc(round(len(points)*0.25))]
+	iq = upper_quartile - lower_quartile
+	upper_outlier_bound = upper_quartile + iq
+	lower_outlier_bound = lower_quartile - iq
 	mean = sum(points)/len(points)
 	deviations = [x - mean for x in points]
 	result = {
@@ -98,8 +103,10 @@ def condense(points):
 		'mean_deviation': sum([abs(x - mean) for x in points])/count,
 		'median': numpy.median(points),
 		'standard_deviation': pow(sum([pow(x - mean, 2) for x in points])/count, 0.5),
-		'upper_quartile': points[math.trunc(round(len(points)*0.75))],
-		'lower_quartile': points[math.trunc(round(len(points)*0.25))]
+		'upper_quartile': upper_quartile,
+		'lower_quartile': lower_quartile,
+		'upper_outliers': [x for x in points if x > upper_outlier_bound],
+		'lower_outliers': [x for x in points if x < lower_outlier_bound]
 	}
 	return result
 
@@ -112,7 +119,7 @@ def outlier_character(value):
 
 def box_plot_text(points):
 	condensed_points = condense(points)
-
+	
 	data_range = condensed_points['maximum'] - condensed_points['minimum']
 	scale = 100.0
 	min_pos = 0
@@ -158,29 +165,13 @@ def box_plot_text(points):
 	
 	return lines
 
-def box_plot_processing(points, orientation):
-	condensed_points = condense(points)
-	upper_quartile = condensed_points['upper_quartile']
-	lower_quartile = condensed_points['lower_quartile']
-	iq = upper_quartile - lower_quartile
-	upper_outlier_bound = upper_quartile + iq
-	lower_outlier_bound = lower_quartile - iq
-
-	template_values = {
-		'median': condensed_points['median'],
-		'minimum': condensed_points['minimum'],
-		'maximum': condensed_points['maximum'],
-		'upper_quartile': upper_quartile,
-		'lower_quartile': lower_quartile,
-		'upper_outliers': [x for x in points if x > upper_outlier_bound],
-		'lower_outliers': [x for x in points if x < lower_outlier_bound]
-		 }
+def box_plot_processing(condensed_values, orientation):
 	if orientation == 'vertical':
 		template = jinja_environment.get_template('templates/vertical_boxplot.processing.jinja')
 	else:
 		template = jinja_environment.get_template('templates/horizontal_boxplot.processing.jinja')
 
-	return template.render(template_values)
+	return template.render(condensed_values)
 	
 def group_values(values):
 	groups = []
@@ -292,16 +283,16 @@ class BoxPlot(webapp.RequestHandler):
 		body = self.request.body
 		format = self.request.get('format', 'text')
 		orientation = self.request.get('orientation', 'horizontal')
-		points = json.loads(body)
+		values = json.loads(body)
 		box_plot_lines = []
 		if format == 'text':
-			box_plot_lines = box_plot_text(points)
+			box_plot_lines = box_plot_text(values)
 			for text_line in box_plot_lines:
 				self.response.out.write(text_line)
 				self.response.out.write("\n")
 		else:
 			if format == 'processing':
-				box_plot_lines = box_plot_processing(points, orientation)
+				box_plot_lines = box_plot_processing(values, orientation)
 				self.response.out.write(box_plot_lines)
 		
 class GroupValues(webapp.RequestHandler):
