@@ -117,9 +117,7 @@ def outlier_character(value):
 		return str(value)
 	return '+'
 
-def box_plot_text(points):
-	condensed_points = condense(points)
-	
+def box_plot_text(condensed_points):
 	data_range = condensed_points['maximum'] - condensed_points['minimum']
 	scale = 100.0
 	min_pos = 0
@@ -131,16 +129,21 @@ def box_plot_text(points):
 	upper_outlier_pos = min(upper_quartile_pos + iq, int(scale))
 	lower_outlier_pos = max(lower_quartile_pos - iq, 0)
 
-	scaled_points = {}
-	for point in points:
+	scaled_lower_outliers = {}
+	for point in condensed_points['lower_outliers']:
 		scaled_point = int((point - condensed_points['minimum']) / data_range * scale)
-		scaled_points[scaled_point] = scaled_points.get(scaled_point, 0) + 1
+		scaled_lower_outliers[scaled_point] = scaled_lower_outliers.get(scaled_point, 0) + 1
+
+	scaled_upper_outliers = {}
+	for point in condensed_points['upper_outliers']:
+		scaled_point = int((point - condensed_points['minimum']) / data_range * scale)
+		scaled_upper_outliers[scaled_point] = scaled_upper_outliers.get(scaled_point, 0) + 1
 
 	lines = []
 	line = ''
 	# lower outliers
 	for i in range(0, lower_outlier_pos - 1):
-		line += outlier_character(scaled_points.get(i, 0))
+		line += outlier_character(scaled_lower_outliers.get(i, 0))
 	line += '['
 
 	# lower quartile
@@ -159,7 +162,7 @@ def box_plot_text(points):
 	# upper outliers
 	line += ']'
 	for i in range(upper_outlier_pos + 1, int(scale)):
-		line += outlier_character(scaled_points.get(i, 0))
+		line += outlier_character(scaled_upper_outliers.get(i, 0))
 		
 	lines.append(line)
 	

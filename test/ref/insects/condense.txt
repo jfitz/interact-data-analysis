@@ -10,4 +10,3 @@ standard_deviation: 7.15308791129
 sum: 684
 upper_outliers: []
 upper_quartile: 15
-
