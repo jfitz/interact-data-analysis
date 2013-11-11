@@ -117,28 +117,7 @@ def outlier_character(value):
 		return str(value)
 	return '+'
 
-def box_plot_text(condensed_points):
-	data_range = condensed_points['maximum'] - condensed_points['minimum']
-	scale = 100.0
-	min_pos = 0
-	max_pos = int(scale)
-	median_pos = int((condensed_points['median'] - condensed_points['minimum']) / data_range * scale)
-	upper_quartile_pos = int((condensed_points['upper_quartile'] - condensed_points['minimum']) / data_range * scale)
-	lower_quartile_pos = int((condensed_points['lower_quartile'] - condensed_points['minimum']) / data_range * scale)
-	iq = upper_quartile_pos - lower_quartile_pos
-	upper_outlier_pos = min(upper_quartile_pos + iq, int(scale))
-	lower_outlier_pos = max(lower_quartile_pos - iq, 0)
-
-	scaled_lower_outliers = {}
-	for point in condensed_points['lower_outliers']:
-		scaled_point = int((point - condensed_points['minimum']) / data_range * scale)
-		scaled_lower_outliers[scaled_point] = scaled_lower_outliers.get(scaled_point, 0) + 1
-
-	scaled_upper_outliers = {}
-	for point in condensed_points['upper_outliers']:
-		scaled_point = int((point - condensed_points['minimum']) / data_range * scale)
-		scaled_upper_outliers[scaled_point] = scaled_upper_outliers.get(scaled_point, 0) + 1
-
+def box_plot_text_horiz(lower_outlier_pos, scaled_lower_outliers, lower_quartile_pos, median_pos, upper_quartile_pos, upper_outlier_pos, scaled_upper_outliers, scale):
 	lines = []
 	line = ''
 	# lower outliers
@@ -163,9 +142,36 @@ def box_plot_text(condensed_points):
 	line += ']'
 	for i in range(upper_outlier_pos + 1, int(scale)):
 		line += outlier_character(scaled_upper_outliers.get(i, 0))
-		
+
 	lines.append(line)
-	
+
+	return lines
+
+def box_plot_text(condensed_points, orientation):
+	data_range = condensed_points['maximum'] - condensed_points['minimum']
+	scale = 100.0
+	min_pos = 0
+	max_pos = int(scale)
+	median_pos = int((condensed_points['median'] - condensed_points['minimum']) / data_range * scale)
+	upper_quartile_pos = int((condensed_points['upper_quartile'] - condensed_points['minimum']) / data_range * scale)
+	lower_quartile_pos = int((condensed_points['lower_quartile'] - condensed_points['minimum']) / data_range * scale)
+	iq = upper_quartile_pos - lower_quartile_pos
+	upper_outlier_pos = min(upper_quartile_pos + iq, int(scale))
+	lower_outlier_pos = max(lower_quartile_pos - iq, 0)
+
+	scaled_lower_outliers = {}
+	for point in condensed_points['lower_outliers']:
+		scaled_point = int((point - condensed_points['minimum']) / data_range * scale)
+		scaled_lower_outliers[scaled_point] = scaled_lower_outliers.get(scaled_point, 0) + 1
+
+	scaled_upper_outliers = {}
+	for point in condensed_points['upper_outliers']:
+		scaled_point = int((point - condensed_points['minimum']) / data_range * scale)
+		scaled_upper_outliers[scaled_point] = scaled_upper_outliers.get(scaled_point, 0) + 1
+
+	lines = []
+	if orientation == 'horizontal':
+		lines = box_plot_text_horiz(lower_outlier_pos, scaled_lower_outliers, lower_quartile_pos, median_pos, upper_quartile_pos, upper_outlier_pos, scaled_upper_outliers, scale)
 	return lines
 
 def box_plot_processing(condensed_values, orientation):
@@ -175,7 +181,7 @@ def box_plot_processing(condensed_values, orientation):
 		template = jinja_environment.get_template('templates/horizontal_boxplot.processing.jinja')
 
 	return template.render(condensed_values)
-	
+
 def group_values(values):
 	groups = []
 	maximum = max(values)
@@ -229,7 +235,7 @@ def stem_graph(groups):
 		value_chars.sort()
 		stem_tuples.append( {'leader': leader, 'values': ''.join(value_chars)} )
 	return stem_tuples
-	
+
 def stem_tuples_to_text(stem_tuples):
 	text_lines = []
 	leader_length = 2 if (len(stem_tuples) > 10) else 1
@@ -280,7 +286,7 @@ class CondenseValues(webapp.RequestHandler):
 	def post(self):
 		self.response.headers['Content-Type'] = 'application/json'
 		self.response.out.write( json.dumps( condense( json.loads(self.request.body) ) ) )
-		
+
 class BoxPlot(webapp.RequestHandler):
 	def post(self):
 		body = self.request.body
@@ -289,22 +295,21 @@ class BoxPlot(webapp.RequestHandler):
 		values = json.loads(body)
 		box_plot_lines = []
 		if format == 'text':
-			box_plot_lines = box_plot_text(values)
-			for text_line in box_plot_lines:
-				self.response.out.write(text_line)
+			box_plot_lines = box_plot_text(values, orientation)
+			for line in box_plot_lines:
+				self.response.out.write(line)
 				self.response.out.write("\n")
-		else:
-			if format == 'processing':
-				box_plot_lines = box_plot_processing(values, orientation)
-				self.response.out.write(box_plot_lines)
-		
+		if format == 'processing':
+			box_plot_lines = box_plot_processing(values, orientation)
+			self.response.out.write(box_plot_lines)
+
 class GroupValues(webapp.RequestHandler):
 	def post(self):
 		self.response.headers['Content-Type'] = 'application/json'
 		values = json.loads(self.request.body)
 		stem = group_values(values)
-		self.response.out.write( json.dumps( stem ) )
-		
+		self.response.out.write( json.dumps(stem) )
+
 class StemGraph(webapp.RequestHandler):
 	def post(self):
 		body = self.request.body
@@ -322,28 +327,28 @@ class TransformPower(webapp.RequestHandler):
 		power = float(self.request.get('power', '1.0'))
 		transformed_values = transform_power(values, power)
 		self.response.out.write( json.dumps( transformed_values ) )
-		
+
 class TransformLog(webapp.RequestHandler):
 	def post(self):
 		body = self.request.body
 		values = json.loads(body)
 		transformed_values = transform_log(values)
 		self.response.out.write( json.dumps( transformed_values ) )
-		
+
 class TransformNormalize(webapp.RequestHandler):
 	def post(self):
 		body = self.request.body
 		values = json.loads(body)
 		transformed_values = transform_normalize(values)
 		self.response.out.write( json.dumps( transformed_values ) )
-		
+
 class TransformZeroBase(webapp.RequestHandler):
 	def post(self):
 		body = self.request.body
 		values = json.loads(body)
 		transformed_values = transform_zerobase(values)
 		self.response.out.write( json.dumps( transformed_values ) )
-		
+
 application = webapp.WSGIApplication(
 	[
 		('/', MainPage),
