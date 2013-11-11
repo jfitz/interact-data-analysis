@@ -1,15 +1,10 @@
 
-int scale_to_view_width(float value, float max_value, float min_value, int view_width)
-{
-  return int((value - min_value) / (max_value - min_value) * view_width);
-}
-
 int scale_to_view_height(float value, float max_value, float min_value, int view_height)
 {
   return int((value - min_value) / (max_value - min_value) * view_height);
 }
 
-void boxplot(int scaled_median, int scaled_lower_quartile, int[] scaled_lower_outliers, int scaled_upper_quartile, int[] scaled_upper_outliers, int median_size, int quartile_size, int outlier_size, int view_width)
+void boxplot(int scaled_median, int scaled_lower_quartile, int[] scaled_lower_outliers, int scaled_upper_quartile, int[] scaled_upper_outliers, int median_size, int quartile_size, int outlier_size, int view_width, int view_height)
 {
   int centerline = view_width / 2;
         		
@@ -63,7 +58,6 @@ void draw()
   float[] upper_outliers = {  };
   float max_value = -0.004;
   float min_value = -0.225;
-  int horiz_offset = 10;
   int vertical_offset = 20;
   
   // scale values to ints
@@ -77,6 +71,6 @@ void draw()
   for ( int i = 0; i < upper_outliers.length; i += 1 )
     scaled_upper_outliers[i] = scale_to_view_height(upper_outliers[i], max_value, min_value, view_height) + vertical_offset;
     
-  boxplot(scaled_median, scaled_lower_quartile, scaled_lower_outliers, scaled_upper_quartile, scaled_upper_outliers, median_size, quartile_size, outlier_size, view_width);
+  boxplot(scaled_median, scaled_lower_quartile, scaled_lower_outliers, scaled_upper_quartile, scaled_upper_outliers, median_size, quartile_size, outlier_size, view_width, view_height);
 }
 
