@@ -8,25 +8,25 @@ void boxplot(int scaled_median, int scaled_lower_quartile, int[] scaled_lower_ou
 {
   int centerline = view_width / 2;
         		
-  // draw horizontal
-  line(centerline, scaled_lower_quartile, centerline, scaled_upper_quartile);
+  // draw vertical
+  line(centerline, view_height - scaled_upper_quartile, centerline, view_height - scaled_lower_quartile);
 
   // draw lower outliers
   for ( int i = 0; i < scaled_lower_outliers.length; i += 1 )
-    line(centerline - outlier_size, scaled_lower_outliers[i], centerline + outlier_size, scaled_lower_outliers[i]);
+    line(centerline - outlier_size, view_height - scaled_lower_outliers[i], centerline + outlier_size, view_height - scaled_lower_outliers[i]);
 
   // draw lower quartile
-  line(centerline - quartile_size, scaled_lower_quartile, centerline + quartile_size, scaled_lower_quartile);
+  line(centerline - quartile_size, view_height - scaled_lower_quartile, centerline + quartile_size, view_height - scaled_lower_quartile);
 
   // draw median
-  line(centerline - median_size, scaled_median, centerline + median_size, scaled_median);
+  line(centerline - median_size, view_height - scaled_median, centerline + median_size, view_height - scaled_median);
 
   // draw upper quartile
-  line(centerline - quartile_size, scaled_upper_quartile, centerline + quartile_size, scaled_upper_quartile);
+  line(centerline - quartile_size, view_height - scaled_upper_quartile, centerline + quartile_size, view_height - scaled_upper_quartile);
 
   // draw upper outliers
   for ( int i = 0; i < scaled_upper_outliers.length; i += 1 )
-    line(centerline - outlier_size, scaled_upper_outliers[i], centerline + outlier_size, scaled_upper_outliers[i]);
+    line(centerline - outlier_size, view_height - scaled_upper_outliers[i], centerline + outlier_size, view_height - scaled_upper_outliers[i]);
 }
 
 int view_width = 60;
