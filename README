@@ -1,0 +1,6 @@
+Interactive data analysis
+
+A set of web services for the Google App Engine, modelled after the techniques described in Donald R. McNeil's "Interactive Data Analysis" from Wiley-Interscience, 1977.
+
+With these web services, one can send in data to get a summary, a box plot, or a stem graph.
+
